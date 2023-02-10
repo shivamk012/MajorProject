@@ -5,11 +5,12 @@ const app = express();
 
 app.use(bodyParser.json());
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.post('/tweeted', (req, res) => {
-    const { body } = request;
+    const { body } = req;
     console.log(body.tweet);
+    res.send("Success");
 });
 
 app.listen(port, () => {
