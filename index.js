@@ -9,8 +9,7 @@ const port = process.env.PORT || 3000;
 
 app.post('/tweeted', (req, res) => {
     const { body } = req;
-    console.log(req);
-    console.log(body);
+    console.log(body.tweet);
     res.send("Success in tweeted");
 });
 
