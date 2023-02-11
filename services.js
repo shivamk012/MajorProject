@@ -19,8 +19,13 @@ export async function updateDB (payload) {
         // console.log(payload.latitude);
         let findLocation = await dbClient.db("Locations").collection("Location").findOne({latitude : payload.latitude});
         if(findLocation === null){
-            let ID = await dbClient.db("Locations").collection("Location").insertOne(payload);
-            return ID;
+            try{
+                let ID = await dbClient.db("Locations").collection("Location").insertOne(payload);
+                console.log(ID);
+                return ID;
+            }catch(err){
+                console.log(err);
+            }
         }else{
             // console.log(obj);
             let updated = await dbClient.db("Locations").collection("Location").updateOne({latitude : payload.latitude},{$set : {"aqi" : payload.aqi}});
