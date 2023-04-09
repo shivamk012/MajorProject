@@ -1,4 +1,5 @@
 import { MongoClient } from 'mongodb';
+import { processLocation , processPollutionData } from './processString.js';
 
 let dbClient = "";
 
@@ -18,9 +19,20 @@ export async function updateDB (payload) {
     try{
         // console.log(payload.latitude);
         let findLocation = await dbClient.db("Locations").collection("Location").findOne({latitude : payload.latitude});
+        const {latitude , aqi} = payload;
+        let processedLocation = processLocation(latitude);
+        let processedPollutionData = processPollutionData(aqi);
+        console.log(processedLocation);
+        console.log(processedPollutionData);
+        console.log(typeof(processedLocation));
+        console.log(typeof(processedPollutionData));
+        let insertData = {
+            location : processedLocation,
+            pollutionData : processedPollutionData
+        }
         if(findLocation === null){
             try{
-                let ID = await dbClient.db("Locations").collection("Location").insertOne(payload);
+                let ID = await dbClient.db("Locations").collection("Location").insertOne(insertData);
                 console.log(ID);
                 return ID;
             }catch(err){
@@ -28,7 +40,7 @@ export async function updateDB (payload) {
             }
         }else{
             // console.log(obj);
-            let updated = await dbClient.db("Locations").collection("Location").updateOne({latitude : payload.latitude},{$set : {"aqi" : payload.aqi}});
+            let updated = await dbClient.db("Locations").collection("Location").updateOne({latitude : processedLocation},{$set : {"pollutionData" : processedPollutionData}});
             return updated;
         } 
     }catch(err){
