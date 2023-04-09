@@ -26,9 +26,11 @@ export async function updateDB (payload) {
         // console.log(processedPollutionData);
         // console.log(typeof(processedLocation));
         // console.log(typeof(processedPollutionData));
+        let currentData = [];
+        currentData.push(processedPollutionData);
         let insertData = {
             location : processedLocation,
-            pollutionData : processedPollutionData
+            pollutionData : currentData
         }
         if(findLocation === null){
             try{
@@ -39,8 +41,10 @@ export async function updateDB (payload) {
                 console.log(err);
             }
         }else{
-            // console.log(obj);
-            let updated = await dbClient.db("Locations").collection("Location").updateOne({location : processedLocation},{$set : {"pollutionData" : processedPollutionData}});
+            console.log(findLocation);    
+            currentData = findLocation.pollutionData;
+            currentData.push(processedPollutionData);
+            let updated = await dbClient.db("Locations").collection("Location").updateOne({location : processedLocation},{$set : {"pollutionData" : currentData}});
             return updated;
         } 
     }catch(err){
