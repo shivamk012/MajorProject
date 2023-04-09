@@ -18,14 +18,14 @@ export default async function connectToMongoDB (){
 export async function updateDB (payload) {
     try{
         // console.log(payload.latitude);
-        let findLocation = await dbClient.db("Locations").collection("Location").findOne({latitude : payload.latitude});
         const {latitude , aqi} = payload;
-        let processedLocation = processLocation(latitude);
         let processedPollutionData = processPollutionData(aqi);
-        console.log(processedLocation);
-        console.log(processedPollutionData);
-        console.log(typeof(processedLocation));
-        console.log(typeof(processedPollutionData));
+        let processedLocation = processLocation(latitude);
+        let findLocation = await dbClient.db("Locations").collection("Location").findOne({location : processedLocation});
+        // console.log(processedLocation);
+        // console.log(processedPollutionData);
+        // console.log(typeof(processedLocation));
+        // console.log(typeof(processedPollutionData));
         let insertData = {
             location : processedLocation,
             pollutionData : processedPollutionData
@@ -40,7 +40,7 @@ export async function updateDB (payload) {
             }
         }else{
             // console.log(obj);
-            let updated = await dbClient.db("Locations").collection("Location").updateOne({latitude : processedLocation},{$set : {"pollutionData" : processedPollutionData}});
+            let updated = await dbClient.db("Locations").collection("Location").updateOne({location : processedLocation},{$set : {"pollutionData" : processedPollutionData}});
             return updated;
         } 
     }catch(err){
