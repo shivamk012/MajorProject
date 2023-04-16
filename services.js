@@ -1,7 +1,18 @@
 import { MongoClient } from 'mongodb';
 import { processLocation , processPollutionData } from './processString.js';
+import fs from 'fs';
 
 let dbClient = "";
+
+function writeFile(payload){
+    fs.writeFile('./currentLocationData.json', JSON.stringify(payload), (err)=>{
+        if( err ) {
+            throw err;
+        }else{
+            console.log("file updated");
+        }
+    });
+}
 
 export default async function connectToMongoDB (){
     const uri = process.env.MONGO_URL;
@@ -32,6 +43,7 @@ export async function updateDB (payload) {
             location : processedLocation,
             pollutionData : currentData
         }
+        writeFile(insertData);
         if(findLocation === null){
             try{
                 let ID = await dbClient.db("Locations").collection("Location").insertOne(insertData);
@@ -55,8 +67,18 @@ export async function updateDB (payload) {
 export async function getLocation(payload){
     try{
         const data = await dbClient.db("Locations").collection("Location").findOne({
-            latitude : payload.latitude
+            location : payload.latitude
         })
+        return data;
+    }catch(err){
+        console.log(err);
+    }
+}
+
+export async function getData(){
+    try{
+        const data = await dbClient.db("Locations").collection("Location").find().toArray();
+        console.log(data[0].pollutionData);
         return data;
     }catch(err){
         console.log(err);
