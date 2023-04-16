@@ -5,13 +5,24 @@ import connectToMongoDB , {updateDB , getLocation , getData} from './services.js
 import axios from 'axios';
 import cors from 'cors';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
-dotenv.config();
 const app = express();
+dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(bodyParser.json());
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "./build")));
 
 const port = process.env.PORT || 8000;
+
+app.get(/^(?!\/api).+/, (req,res)=>{
+    res.sendFile(path.join(__dirname, './build/index.html'));
+})
 
 app.get('/api/getPath' , async(req,res)=>{
     const at = "pk.eyJ1Ijoic2hpdmFtazAxMiIsImEiOiJjbGZtdDEybjAwZjkyM3FvM3JlZmdjOTQ5In0.DRFtEaiTP-sd468Y75z9Wg";
@@ -55,11 +66,6 @@ app.get('/api/getPollutionData' , (req,res)=>{
         res.send(data);
     });
 });
-
-app.get('/' , (req,res)=>{
-    res.send("Success in home");
-});
-
 
 connectToMongoDB();
 app.listen(port, () => {
